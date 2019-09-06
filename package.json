@@ -1,0 +1,13 @@
+{
+  "name": "match",
+  "version": "0.0.0",
+  "scripts": {
+    "build": "tsc",
+    "test": "tsc && mocha dist"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.7",
+    "mocha": "^6.2.0",
+    "typescript": "^3.6.2"
+  }
+}

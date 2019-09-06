@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "lib": ["es6"],
+    "outDir": "dist",
+    "strict": true
+  }
+}
