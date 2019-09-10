@@ -36,7 +36,7 @@ function findValue(x: number): Result | Error {
 }
 
 const result: number = match(findValue(number), [
-  when(Result, res => res.value),
+  when(Result, ({ value }) => value),
   when(Error, () => 0),
 ])
 
