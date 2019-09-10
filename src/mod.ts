@@ -1,32 +1,32 @@
 type Constructor = (...args: any[]) => any
-type Value = string | number
-type On = string | number | Constructor
+type Value = string | number | object
+type On = string | number | Compare | Constructor
 type Matched<T> = T extends Constructor ? ReturnType<T> : T
 type Action<T> = (value: Matched<T>) => any
 type Compare = (value: Value) => boolean
 type When<O = any> = [Compare, Action<O>]
 
-export function match(value: Value, whens: When[]) {
+export function match<T = unknown>(value: Value, whens: When[]): T | undefined {
   for (const [compare, action] of whens) {
     if (compare(value)) return action(value)
   }
 }
 
 export function when<O extends On>(on: O, action: Action<O>): When<O> {
-  return [value => on === value, action]
+  return [buildCompare(on), action]
 }
 
-// Test examples
+export function otherwise(action: Action<any>): When {
+  return [() => true, action]
+}
 
-const result = match("value", [
-  when(42, x => "The answer to life, the universe, and everything."),
-  when(String, x => `Hello {x}!`),
-  when(Number, x => `You got: ${x}`),
-  when(Error, x => `Oh no! ${x.message}`),
-])
+function buildCompare(on: On): Compare {
+  // Match constructor
+  if (isConstructor(on)) return value => value.constructor === on
+  // Exact match
+  return value => on === value
+}
 
-match("best", [
-  when("good", () => "no"),
-  when("better", () => "no"),
-  when("best", () => "yes"),
-])
+function isConstructor(value: any): value is Constructor {
+  return Boolean(value.prototype) && Boolean(value.prototype.constructor.name)
+}

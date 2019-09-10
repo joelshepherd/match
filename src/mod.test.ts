@@ -1,4 +1,4 @@
-import { any, match, number, string } from "./mod"
+import { match, otherwise, when } from "./mod"
 
 class AssertionError {
   constructor(
@@ -14,82 +14,75 @@ function assert(actual: any, expected: any) {
 }
 
 describe("match()", function() {
-  it("should return exact matches first", function() {
+  it("should match exact values", function() {
     assert(
       "correct",
-      match(2, {
-        1: () => "incorrect",
-        2: () => "correct",
-        3: () => "incorrect",
-      }),
+      match(2, [
+        when(1, () => "incorrect"),
+        when(2, () => "correct"),
+        when(3, () => "incorrect"),
+      ]),
     )
 
     assert(
       "yes",
-      match("best", {
-        good: () => "no",
-        better: () => "nah",
-        best: () => "yes",
-      }),
+      match("best", [
+        when("good", () => "no"),
+        when("better", () => "nah"),
+        when("best", () => "yes"),
+      ]),
     )
   })
 
-  it("should return type fallback if exists on no match", function() {
+  it("should match constructor types", function() {
     assert(
       "correct",
-      match("text", {
-        1: () => "incorrect",
-        not: () => "incorrect",
-        [string]: () => "correct",
-      }),
+      match("text", [
+        when(1, () => "incorrect"),
+        when("not", () => "incorrect"),
+        when(String, () => "correct"),
+      ]),
     )
 
     assert(
       "yes",
-      match(99, {
-        10: () => "no",
-        [number]: () => "yes",
-        [any]: () => "no",
-      }),
+      match(99, [
+        when(10, () => "no"),
+        when(Number, () => "yes"),
+        otherwise(() => "no"),
+      ]),
     )
   })
 
-  it("should return any fallback if exists on no match", function() {
+  it("should match otherwise fallbacks", function() {
     assert(
       "correct",
-      match("not going to", {
-        1: () => "incorrect",
-        nope: () => "incorrect",
-        [number]: () => "incorrect",
-        [any]: () => "correct",
-      }),
+      match("not going to", [
+        when(1, () => "incorrect"),
+        when("nope", () => "incorrect"),
+        when(Number, () => "incorrect"),
+        otherwise(() => "correct"),
+      ]),
     )
   })
 
-  it("should return undefined on no match or fallback", function() {
+  it("should return undefined if no matches", function() {
     assert(
       undefined,
-      match(11, {
-        10: () => "no",
-        string: () => "no",
-        [string]: () => "no",
-      }),
+      match(11, [
+        when(10, () => "no"),
+        when("string", () => "no"),
+        when(String, () => "no"),
+      ]),
     )
   })
 
   it("should pass value into match functions", function() {
-    assert(
-      100,
-      match(50, {
-        [number]: x => x * 2,
-      }),
-    )
+    assert(100, match(50, [when(Number, x => x * 2)]))
 
     assert(
       "Text was hello",
-      match("hello", {
-        [string]: x => `Text was ${x}`,
-      }),
+      match("hello", [when(String, x => `Text was ${x}`)]),
     )
   })
 })
