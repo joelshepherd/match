@@ -1,13 +1,15 @@
 # match
 
-A fun experiment emulating the upcoming pattern matching proposal.
+A fun experiment emulating (some of) the upcoming pattern matching proposal.
 
 ## Usage
+
+Example usage returning a phrase based on a number.
 
 ```ts
 import { match, otherwise, when } from "match-[something]"
 
-let howMany = match(count, [
+const howMany = match(count, [
   when(0, () => "None for you"),
   when(1, () => "You have one"),
   when(2, () => "You have a couple"),
@@ -18,4 +20,25 @@ let howMany = match(count, [
 ])
 
 console.log(howMany)
+```
+
+Example usage the spirit of Rust's result convention.
+
+```ts
+import { match, when } from "match-[something]"
+
+class Result {
+  constructor(public value: number) {}
+}
+
+function findValue(x: number): Result | Error {
+  return x > 0 ? new Result(x) : new Error("Invalid number")
+}
+
+const result: number = match(findValue(number), [
+  when(Result, res => res.value),
+  when(Error, () => 0),
+])
+
+console.log(result)
 ```

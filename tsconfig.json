@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
+    "declaration": true,
     "lib": ["es6"],
     "outDir": "dist",
+    "sourceMap": true,
     "strict": true
   }
 }
