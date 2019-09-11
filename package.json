@@ -1,13 +1,17 @@
 {
   "name": "mch",
   "version": "0.1.0",
-  "author": {
-    "email": "joel-npm@swivid.ink",
-    "name": "Joel Shepherd"
+  "homepage": "https://github.com/joelshepherd/match#readme",
+  "bugs": {
+    "url": "https://github.com/joelshepherd/match/issues"
   },
   "license": "MIT",
+  "author": "Joel Shepherd <joel-npm@swivid.ink>",
+  "main": "dist/mod.js",
+  "repository": "github:joelshepherd/match",
   "scripts": {
     "build": "tsc",
+    "prepublish": "npm run-script build",
     "test": "tsc && mocha dist"
   },
   "devDependencies": {
