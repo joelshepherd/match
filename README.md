@@ -6,13 +6,13 @@ No dependencies and native TypeScript support.
 
 Supports a variety of match types:
 
-| Type        | Examples                     | Match method                                          |
-| ----------- | ---------------------------- | ----------------------------------------------------- |
-| Exact       | `when(20, ...)`              | Strict equals (using`Object.is`)                      |
-| Object      | `when({ status: 200 }, ...)` | Matches if expression contains all keys in the object |
-| Constructor | `when(String, ...)`          | Match if expression is an instanceof the constructor  |
-| RegExp      | `when(/hi/, ...)`            | Runs `.test()` on the regex                           |
-| Default     | `otherwise(...)`             | A default fallback that matches anything              |
+| Type        | Examples                     | Match method                          |
+| ----------- | ---------------------------- | ------------------------------------- |
+| Exact       | `when(20, ...)`              | Strictly equals the value             |
+| Object      | `when({ status: 200 }, ...)` | Contains all properties of the object |
+| Constructor | `when(String, ...)`          | Instance of the constructor           |
+| RegExp      | `when(/hi/, ...)`            | Tests positive against the RegExp     |
+| Default     | `otherwise(...)`             | Default fallback that maches anything |
 
 ## Install
 
@@ -33,8 +33,6 @@ const howMany = match(count, [
     throw new Error("Is this even a number?") // it's not
   }),
 ])
-
-console.log(howMany)
 ```
 
 Example usage with React.
@@ -84,6 +82,4 @@ const result = match(findValue(number), [
   when(Result, ({ value }) => value),
   when(Error, () => 0),
 ])
-
-console.log(result)
 ```
