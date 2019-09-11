@@ -1,38 +1,43 @@
-type Constructor = (...args: any[]) => any
-type Value = string | number | object
-type On = string | number | Compare | Constructor
-type Action<T> = (value: T extends Constructor ? ReturnType<T> : T) => any
-type Compare = (value: Value) => boolean
-type When<O = any> = [Compare, Action<O>]
+import {
+  Compare,
+  Condition,
+  Constructor,
+  Expression,
+  Then,
+  When,
+} from "./types"
 
 /**
  * Match the value against the conditions and return the result.
  */
-export function match<T = unknown>(value: Value, whens: When[]): T | undefined {
-  for (const [compare, action] of whens) {
-    if (compare(value)) return action(value)
+export function match(expression: Expression, whens: When[]) {
+  for (const [compare, then] of whens) {
+    if (compare(expression)) return then(expression)
   }
 }
 
 /**
  * Default case which matches any value.
  */
-export function otherwise(action: Action<any>): When {
-  return [() => true, action]
+export function otherwise(then: Then<any, any>): When {
+  return [() => true, then]
 }
 
 /**
  * Add a new match case.
  */
-export function when<O extends On>(on: O, action: Action<O>): When<O> {
-  return [createCompare(on), action]
+export function when<P extends Condition, R>(
+  condition: P,
+  then: Then<P, R>,
+): When<P, R> {
+  return [createCompare(condition), then]
 }
 
-function createCompare(on: On): Compare {
+function createCompare(condition: Condition): Compare {
   // Match constructor
-  if (isConstructor(on)) return value => value.constructor === on
+  if (isConstructor(condition)) return value => condition === value.constructor
   // Exact match
-  return value => Object.is(on, value)
+  return value => Object.is(condition, value)
 }
 
 function isConstructor(value: any): value is Constructor {

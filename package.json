@@ -1,6 +1,11 @@
 {
-  "name": "match",
-  "version": "0.0.0",
+  "name": "mch",
+  "version": "0.1.0",
+  "author": {
+    "email": "joel-npm@swivid.ink",
+    "name": "Joel Shepherd"
+  },
+  "license": "MIT",
   "scripts": {
     "build": "tsc",
     "test": "tsc && mocha dist"

@@ -22,6 +22,20 @@ const howMany = match(count, [
 console.log(howMany)
 ```
 
+Example usage with React.
+
+```tsx
+import React from "react";
+import { match, when } from "match-[something]"
+
+<div>
+  {match(value, [
+    when(Number, x => <span>You have {x}</span>),
+    when(Error, error => <ErrorRender error={error}>),
+  ])}
+</div>
+```
+
 Example usage the spirit of Rust's result convention.
 
 ```ts
@@ -35,7 +49,7 @@ function findValue(x: number): Result | Error {
   return x > 0 ? new Result(x) : new Error("Invalid number")
 }
 
-const result: number = match(findValue(number), [
+const result = match(findValue(number), [
   when(Result, ({ value }) => value),
   when(Error, () => 0),
 ])
