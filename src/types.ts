@@ -2,18 +2,29 @@ type BuiltIn = (...args: any[]) => any
 
 export type Constructor = new (...args: any[]) => any
 
-export type Expression = string | number | object
+export type Expression = boolean | number | object | string
 
-export type Condition = string | number | BuiltIn | Constructor
+export type Condition =
+  | boolean
+  | number
+  | object
+  | string
+  | RegExp
+  | BuiltIn
+  | Constructor
 
-type ActionType<T> = T extends BuiltIn
+type ActionType<T extends Condition> = T extends RegExp
+  ? ReturnType<T["exec"]>
+  : T extends BuiltIn
   ? ReturnType<T>
   : T extends Constructor
   ? InstanceType<T>
+  : T extends object
+  ? T & Record<keyof any, unknown>
   : T
 
-export type Then<T, R> = (value: ActionType<T>) => R
+export type Then<T extends Condition, R> = (value: ActionType<T>) => R
 
 export type Compare = (value: Expression) => boolean
 
-export type When<O = any, R = any> = [Compare, Then<O, R>]
+export type When<O extends Condition = any, R = any> = [Compare, Then<O, R>]

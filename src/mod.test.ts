@@ -1,88 +1,109 @@
+import { expect } from "chai"
 import { match, otherwise, when } from "./mod"
-
-class AssertionError {
-  constructor(
-    public message: string,
-    public expected: any,
-    public actual: any,
-  ) {}
-}
-
-function assert(actual: any, expected: any) {
-  if (!Object.is(expected, actual))
-    throw new AssertionError("Assertion failed", expected, actual)
-}
 
 describe("match()", function() {
   it("should match exact values", function() {
-    assert(
-      "correct",
+    expect(
       match(2, [
         when(1, () => "incorrect"),
         when(2, () => "correct"),
         when(3, () => "incorrect"),
       ]),
-    )
+    ).to.equal("correct")
 
-    assert(
-      "yes",
+    expect(
       match("best", [
         when("good", () => "no"),
         when("better", () => "nah"),
         when("best", () => "yes"),
       ]),
-    )
+    ).to.equal("yes")
+
+    expect(
+      match(false, [when(true, () => "no"), when(false, () => "si")]),
+    ).to.equal("si")
+  })
+
+  it("should match regular expressions", function() {
+    expect(
+      match("text", [when(/not/, () => "no"), when(/text/, () => "yes")]),
+    ).to.equal("yes")
   })
 
   it("should match constructor types", function() {
-    assert(
-      "correct",
+    expect(
       match("text", [
         when(1, () => "incorrect"),
         when("not", () => "incorrect"),
         when(String, () => "correct"),
       ]),
-    )
+    ).to.equal("correct")
 
-    assert(
-      "yes",
+    expect(
       match(99, [
         when(10, () => "no"),
         when(Number, () => "yes"),
         otherwise(() => "no"),
       ]),
-    )
+    ).to.equal("yes")
+  })
+
+  it("should shallow match objects", function() {
+    expect(
+      match({ foo: "bar" }, [
+        when(1, () => "wrong"),
+        when(String, () => "nope"),
+        when({ foo: "bar" }, () => "right"),
+      ]),
+    ).to.equal("right")
+
+    expect(
+      match({ status: 200 }, [
+        when({ status: 404 }, () => "not correct"),
+        when({ status: 500 }, () => "not correct"),
+        when({ status: 200 }, () => "correct"),
+      ]),
+    ).to.equal("correct")
   })
 
   it("should match otherwise fallbacks", function() {
-    assert(
-      "correct",
+    expect(
       match("not going to", [
         when(1, () => "incorrect"),
         when("nope", () => "incorrect"),
         when(Number, () => "incorrect"),
         otherwise(() => "correct"),
       ]),
-    )
+    ).to.equal("correct")
   })
 
   it("should return undefined if no matches", function() {
-    assert(
-      undefined,
+    expect(
       match(11, [
         when(10, () => "no"),
         when("string", () => "no"),
         when(String, () => "no"),
       ]),
-    )
+    ).to.be.undefined
   })
 
   it("should pass value into match functions", function() {
-    assert(100, match(50, [when(Number, x => x * 2)]))
+    expect(match(50, [when(Number, x => x * 2)])).to.equal(100)
 
-    assert(
+    expect(match("hello", [when(String, x => `Text was ${x}`)])).to.equal(
       "Text was hello",
-      match("hello", [when(String, x => `Text was ${x}`)]),
     )
+
+    expect(
+      match({ status: 200, body: "Hello world" }, [
+        when({ status: 200 }, x => x.body),
+      ]),
+    ).to.equal("Hello world")
+  })
+
+  it("should pass through promises", async function() {
+    expect(
+      await match(true, [otherwise(() => Promise.resolve("promised"))]),
+    ).to.equal("promised")
   })
 })
