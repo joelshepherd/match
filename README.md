@@ -70,16 +70,12 @@ Example usage the spirit of Rust's result convention.
 ```ts
 import { match, when } from "mch"
 
-class Result {
-  constructor(public value: number) {}
-}
-
-function findValue(x: number): Result | Error {
-  return x > 0 ? new Result(x) : new Error("Invalid number")
+function findValue(x: number): Result<number, string> {
+  return x > 0 ? new Ok(x) : new Err("Invalid number")
 }
 
 const result = match(findValue(number), [
-  when(Result, ({ value }) => value),
-  when(Error, () => 0),
+  when(Ok, ({ value }) => value),
+  when(Err, () => 0),
 ])
 ```
