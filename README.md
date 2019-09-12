@@ -8,7 +8,7 @@ Supports a variety of match types:
 
 | Type        | Examples                     | Match method                          |
 | ----------- | ---------------------------- | ------------------------------------- |
-| Exact       | `when(20, ...)`              | Strictly equals the value             |
+| Value       | `when(20, ...)`              | Strictly equals the exact value       |
 | Object      | `when({ status: 200 }, ...)` | Contains all properties of the object |
 | Constructor | `when(String, ...)`          | Instance of the constructor           |
 | RegExp      | `when(/hi/, ...)`            | Tests positive against the RegExp     |
