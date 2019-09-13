@@ -66,6 +66,36 @@ describe("match()", function() {
     ).to.equal("correct")
   })
 
+  it("should match object keys as conditions", function() {
+    expect(
+      match({ method: "GET", path: "/test" }, [
+        when({ status: "POST" }, () => "failure"),
+        when({ method: "GET", path: /test/ }, () => "success"),
+      ]),
+    ).to.equal("success")
+
+    expect(
+      match({ status: 200, headers: { "Content-Type": "application/json" } }, [
+        when(
+          { status: 200, headers: { "Content-Type": "application/text" } },
+          () => "false",
+        ),
+        when(
+          { status: 200, headers: { "Content-Type": "application/json" } },
+          () => "true",
+        ),
+      ]),
+    ).to.equal("true")
+
+    expect(
+      match({ status: 503 }, [
+        when({ status: /4\d{2}/ }, () => "client error"),
+        when({ status: /2\d{2}/ }, () => "success status"),
+        when({ status: /5\d{2}/ }, () => "server error"),
+      ]),
+    ).to.equal("server error")
+  })
+
   it("should match otherwise fallbacks", function() {
     expect(
       match("not going to", [
@@ -81,7 +111,7 @@ describe("match()", function() {
     expect(
       match(11, [
         when(10, () => "no"),
-        when("string", () => "no"),
+        when("text", () => "no"),
         when(String, () => "no"),
       ]),
     ).to.be.undefined

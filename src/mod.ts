@@ -36,7 +36,7 @@ export function when<P extends Condition, R>(
 function createCompare(condition: Condition): Compare {
   // Match regex
   if (condition instanceof RegExp) {
-    return value => typeof value === "string" && condition.test(value)
+    return value => condition.test(String(value))
   }
   // Match constructor
   if (isConstructor(condition)) {
@@ -44,8 +44,9 @@ function createCompare(condition: Condition): Compare {
   }
   // Match object keys
   if (typeof condition === "object") {
-    return value => typeof value === "object" && isContained(condition, value)
+    return value => typeof value === "object" && compareObject(condition, value)
   }
+  // @todo Add function
   // Exact match
   return value => Object.is(condition, value)
 }
@@ -54,16 +55,14 @@ function isConstructor(value: any): value is Constructor {
   return Boolean(value && value.prototype && value.prototype.constructor.name)
 }
 
-function isContained(condition: object, value: object) {
+function compareObject(condition: object, value: object) {
   if (Object.is(condition, value)) return true
 
   const keys = Object.getOwnPropertyNames(condition)
 
-  for (let i = 0; i < keys.length; i++) {
-    const propName = keys[i]
-
+  for (const key of keys) {
     // @ts-ignore
-    if (condition[propName] !== value[propName]) {
+    if (!createCompare(condition[key])(value[key])) {
       return false
     }
   }
