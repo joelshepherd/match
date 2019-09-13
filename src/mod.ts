@@ -1,31 +1,16 @@
-import {
-  Compare,
-  Condition,
-  Constructor,
-  Expression,
-  Then,
-  When,
-} from "./types"
-
-/**
- * Match the value against the conditions and return the result.
- */
+/** Match the value against the conditions and return the result. */
 export function match(expression: Expression, whens: When[]) {
   for (const [compare, then] of whens) {
     if (compare(expression)) return then(expression)
   }
 }
 
-/**
- * Default case which matches any value.
- */
+/** Default case which matches any value. */
 export function otherwise(then: Then<any, any>): When {
   return [() => true, then]
 }
 
-/**
- * Add a new match case.
- */
+/** Add a new match case. */
 export function when<P extends Condition, R>(
   condition: P,
   then: Then<P, R>,
@@ -42,11 +27,11 @@ function createCompare(condition: Condition): Compare {
   if (isConstructor(condition)) {
     return value => condition === value.constructor
   }
+  // @todo Add function matcher
   // Match object keys
   if (typeof condition === "object") {
     return value => typeof value === "object" && compareObject(condition, value)
   }
-  // @todo Add function
   // Exact match
   return value => Object.is(condition, value)
 }
@@ -69,3 +54,27 @@ function compareObject(condition: object, value: object) {
 
   return true
 }
+
+type BuiltIn = (...args: any[]) => any
+type Constructor = new (...args: any[]) => any
+type Expression = boolean | number | object | string
+type Condition =
+  | boolean
+  | number
+  | object
+  | string
+  | RegExp
+  | BuiltIn
+  | Constructor
+type ActionType<T extends Condition> = T extends RegExp
+  ? ReturnType<T["exec"]>
+  : T extends BuiltIn
+  ? ReturnType<T>
+  : T extends Constructor
+  ? InstanceType<T>
+  : T extends object
+  ? T & Record<keyof any, unknown>
+  : T
+type Then<T extends Condition, R> = (value: ActionType<T>) => R
+type Compare = (value: Expression) => boolean
+export type When<O extends Condition = any, R = any> = [Compare, Then<O, R>]

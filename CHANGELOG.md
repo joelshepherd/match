@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 - Adding recursive object condition checking
+- Moving types into `mod.ts` for deno compatibility
 
 ## [0.2.0] - 2019-09-11
 
