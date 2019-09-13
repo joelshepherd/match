@@ -48,6 +48,16 @@ describe("match()", function() {
     ).to.equal("yes")
   })
 
+  it("should match custom match functions", function() {
+    expect(
+      match(10, [
+        when((x: number) => x === 1, () => "no"),
+        when((x: number) => x === 10, () => "yes"),
+        when((x: number) => x === 100, () => "no"),
+      ]),
+    ).to.equal("yes")
+  })
+
   it("should shallow match objects", function() {
     expect(
       match({ foo: "bar" }, [
@@ -69,7 +79,7 @@ describe("match()", function() {
   it("should match object keys as conditions", function() {
     expect(
       match({ method: "GET", path: "/test" }, [
-        when({ status: "POST" }, () => "failure"),
+        when({ status: "GET", path: /tset/ }, () => "failure"),
         when({ method: "GET", path: /test/ }, () => "success"),
       ]),
     ).to.equal("success")

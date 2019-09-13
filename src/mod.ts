@@ -27,7 +27,9 @@ function createCompare(condition: Condition): Compare {
   if (isConstructor(condition)) {
     return value => condition === value.constructor
   }
-  // @todo Add function matcher
+  if (typeof condition === "function") {
+    return value => condition(value)
+  }
   // Match object keys
   if (typeof condition === "object") {
     return value => typeof value === "object" && compareObject(condition, value)
@@ -63,6 +65,7 @@ type Condition =
   | number
   | object
   | string
+  | Compare
   | RegExp
   | BuiltIn
   | Constructor

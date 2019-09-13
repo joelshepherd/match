@@ -6,13 +6,14 @@ No dependencies and native TypeScript support.
 
 Supports a variety of match types:
 
-| Type        | Examples                        | Match method                          |
-| ----------- | ------------------------------- | ------------------------------------- |
-| Value       | `when(20, ...)`                 | Strictly equals the exact value       |
-| Object      | `when({ status: Number }, ...)` | Recursively passes each key condition |
-| Constructor | `when(String, ...)`             | Instance of the constructor           |
-| RegExp      | `when(/hi/, ...)`               | Tests positive against the RegExp     |
-| Default     | `otherwise(...)`                | Default fallback that maches anything |
+| Type             | Examples                        | Match method                          |
+| ---------------- | ------------------------------- | ------------------------------------- |
+| Value            | `when(20, ...)`                 | Strictly equals the exact value       |
+| Object           | `when({ status: Number }, ...)` | Recursively passes each key condition |
+| Constructor      | `when(String, ...)`             | Instance of the constructor           |
+| RegExp           | `when(/hi/, ...)`               | Tests positive against the RegExp     |
+| Compare Function | `when(x => x === 10, ...)`      | Custom compare function               |
+| Default          | `otherwise(...)`                | Default fallback that maches anything |
 
 ## Install
 
@@ -55,7 +56,7 @@ Example usage with async/await and a fetch response.
 const response = await fetch(url)
 
 const body = await match(response, [
-  when({ status: 200 }, res => res.json()),
+  when({ status: /2\d\d/ }, res => res.json()),
   when({ status: 404 }, () => {
     throw new Error("404 Not Found")
   }),
