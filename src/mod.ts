@@ -33,6 +33,7 @@ function createCompare(condition: Condition): Compare {
   if (isConstructor(condition)) {
     return (value) => condition === value.constructor;
   }
+  // Match compare function
   if (typeof condition === "function") {
     return (value) => condition(value);
   }
