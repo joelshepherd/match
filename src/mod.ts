@@ -1,20 +1,26 @@
 /** Match the value against the conditions and return the result. */
-export function match(expression: Expression, whens: When[]) {
+export function match<E extends Expression, W extends When<E, any, any>[]>(
+  expression: E,
+  whens: W
+): ReturnType<W[0][1]> | undefined {
   for (const [compare, then] of whens) {
     if (compare(expression)) return then(expression);
   }
+  // @todo remove `undefined` from response if `otherwise()` is used
 }
 
 /** Default case which matches any value. */
-export function otherwise(then: Then<any, any>): When {
+export function otherwise<E extends Expression, R>(
+  then: Then<E, E, R>
+): When<E, E, R> {
   return [() => true, then];
 }
 
 /** Add a new match case. */
-export function when<P extends Condition, R>(
+export function when<E extends Expression, P extends Condition, R>(
   condition: P,
-  then: Then<P, R>
-): When<P, R> {
+  then: Then<E, P, R>
+): When<E, P, R> {
   return [createCompare(condition), then];
 }
 
@@ -70,15 +76,24 @@ type Condition =
   | RegExp
   | BuiltIn
   | Constructor;
-type ActionType<T extends Condition> = T extends RegExp
+type ActionType<T> = T extends RegExp
   ? ReturnType<T["exec"]>
   : T extends BuiltIn
   ? ReturnType<T>
   : T extends Constructor
   ? InstanceType<T>
   : T extends object
-  ? T & Record<keyof any, unknown>
+  ? { [K in keyof T]: ActionType<T[K]> }
   : T;
-type Then<T extends Condition, R> = (value: ActionType<T>) => R;
+type Then<E, T extends Condition, R> = (
+  value: Intersection<E, ActionType<T>>
+) => R;
 type Compare = (value: Expression) => boolean;
-export type When<O extends Condition = any, R = any> = [Compare, Then<O, R>];
+export type When<E = any, O extends Condition = any, R = any> = [
+  Compare,
+  Then<E, O, R>
+];
+
+type Intersection<A, B> = A & B;
+
+// function m<C, W extends any[]>(condition: C, ws: W):
